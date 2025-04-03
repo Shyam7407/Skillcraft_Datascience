@@ -1,0 +1,29 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the dataset
+from google.colab import files
+uploaded=files.upload()
+
+df = pd.read_csv("API_SP.POP.TOTL_DS2_en_csv_v2_26346.csv", skiprows=4)
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+ages = [22, 25, 30, 45, 18, 40, 33, 55, 29, 36, 42, 50, 27, 31, 37, 41, 28, 24]  # Sample data
+plt.hist(ages, bins=np.arange(10, 60, 5), color='blue', edgecolor='black', alpha=0.7)
+plt.xlabel('Age Groups')
+plt.ylabel('Number of People')
+plt.title('Age Distribution in a Population')
+plt.show()
+
+
+genders = ['Male', 'Female','Other']
+counts = [500, 480, 20]
+
+plt.bar(genders, counts, color=['blue', 'pink','purple'])
+plt.xlabel('Gender')
+plt.ylabel('Population Count')
+plt.title('Gender Distribution in Population')
+plt.show()
