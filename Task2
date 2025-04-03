@@ -1,0 +1,26 @@
+import pandas as pd
+df=pd.read_csv("C:/Users/Asus/OneDrive/Desktop/shyam/Skillcraft/titanic/train.csv")
+print(df.head())
+print(df.isnull().sum())
+#fill missing age values with the median
+df['Age'].fillna(df['Age'].median(), inplace=True)
+df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+df.drop(columns=['Cabin'])
+print(df.isnull().sum())
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.barplot(x='Sex', y='Survived', data=df)
+plt.title("Survival Rate by Gender")
+plt.show()
+
+sns.barplot(x='Pclass',y='Survived',data=df)
+plt.title("Survival Rate by Passenger Class")
+plt.show()
+
+#Age distribution
+plt.hist(df['Age'],bins=20, color='skyblue', edgecolor='black')
+plt.xlabel("Age")
+plt.ylabel("Count")
+plt.title("Age Distribution of passengers")
+plt.show()
