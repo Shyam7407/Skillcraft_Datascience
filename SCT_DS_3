@@ -1,0 +1,74 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import folium
+from folium.plugins import HeatMap
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+
+# Load dataset (Ensure you've uploaded the file first)
+df = pd.read_csv("C:/Users/Asus/OneDrive/Desktop/shyam/Skillcraft/archive (2)/US_Accidents_March23.csv")
+
+# Display basic info
+df.head()
+df.info()
+
+df = df[['Severity','Start_Time','Start_Lat','Start_Lng','End_Time','End_Lat','End_Lng','Distance(mi)','Temperature(F)','Humidity(%)','Pressure(in)','Visibility(mi)','Wind_Speed(mph)','Weather_Condition']]
+df = df.dropna()
+df = df.drop_duplicates()   
+
+df['Start_Time'] = pd.to_datetime(df['Start_Time'])
+
+df['Hour'] = df['Start_Time'].dt.hour
+df['DayOfWeek'] = df['Start_Time'].dt.dayofweek
+df['Month'] = df['Start_Time'].dt.month
+
+df.fillna(df.mean(),inplace=True)
+
+#3 analysis and visualization
+#accidents by time of day
+plt.figure(figsize=(12,6))
+sns.countplot(x=df['Hour'], palette='coolwarm')
+plt.title('Accidents by Hour of Day')
+plt.xlabel('Hour')
+plt.ylabel('Number of Accidents')
+plt.xticks(rotation=45) 
+plt.show()
+
+#accidents by weather condition
+plt.figure(figsize=(14,6))
+top_weather_condition=df['Weather_Condition'].value_counts().nlargest(10)
+sns.barplot(x=top_weather_condition.index, y=top_weather_condition.values, palette='viridis')
+plt.title('Top 10 Weather Conditions for Accidents')
+plt.xticks(rotation=45)
+plt.show()
+
+#accident hotspot visualization(map)
+m=folium.Map(location=[37.0902, -95.7129], zoom_start=4)
+sample_df=df[['start_Lat','start_Lng']].sample(1000)
+HeatMap(data=sample_df, radius=10).add_to(m)    
+m
+
+
+# Encode categorical variables
+df['Sunrise_Sunset'] = df['Sunrise_Sunset'].map({'Day': 1, 'Night': 0})
+
+# Select features and target variable
+X = df[['Hour', 'DayOfWeek', 'Month', 'Temperature(F)', 'Visibility(mi)', 'Precipitation(in)', 'Wind_Speed(mph)', 'Sunrise_Sunset']]
+y = df['Severity']
+
+# Split data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a Random Forest Model
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Display results
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
